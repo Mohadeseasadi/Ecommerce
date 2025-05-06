@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,8 +13,16 @@ export class UsersService {
     private readonly userRepository:Repository<User>
   ){}
   
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const newUser = this.userRepository.create(createUserDto);
+
+      return await this.userRepository.save(newUser);
+
+    } catch (error) {
+      console.log(error , '---> error')
+      throw new BadRequestException('Error creating user')
+    }
   }
 
   findAll() {
