@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,13 +11,17 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
-    
+
     return new APiResponse(true , 'User created successfully' , user);     
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(
+    @Query('limit') limit: number=10 ,
+    @Query('page') page:number=1
+  ) {
+    const users = await this.usersService.findAll(limit, page);
+    return new APiResponse(true , 'User fetching successfully' , users);
   }
 
   @Get(':id')

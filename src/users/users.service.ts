@@ -13,20 +13,23 @@ export class UsersService {
     private readonly userRepository:Repository<User>
   ){}
   
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const newUser = this.userRepository.create(createUserDto);
 
       return await this.userRepository.save(newUser);
 
     } catch (error) {
-      console.log(error , '---> error')
       throw new BadRequestException('Error creating user')
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(limit: number, page: number): Promise<User[]> {
+    const query = this.userRepository.createQueryBuilder('users');
+
+    query.skip((page -1)*limit).take(limit) ;  
+    
+    return await query.getMany();
   }
 
   findOne(id: number) {
