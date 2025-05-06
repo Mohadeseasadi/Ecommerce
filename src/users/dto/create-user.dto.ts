@@ -20,7 +20,7 @@ export class CreateUserDto {
     @MinLength(8, {message: "password length is 8 charcter"})
     password: string;
     
-    @IsEnum(UserRoleEnum, {message:"role is required"})
+    @IsEnum(UserRoleEnum, {message:"invalid role"})
     @IsOptional()
     role: UserRoleEnum;
 }
