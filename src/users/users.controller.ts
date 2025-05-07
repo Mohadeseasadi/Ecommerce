@@ -21,12 +21,14 @@ export class UsersController {
     @Query('page') page:number=1
   ) {
     const users = await this.usersService.findAll(limit, page);
-    return new APiResponse(true , 'User fetching successfully' , users);
+    return new APiResponse(true , 'Users fetching successfully' , users);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const user = await this.usersService.findOne(+id);
+
+    return new APiResponse(true , 'User fetching successflly' ,user )
   }
 
   @Patch(':id')
