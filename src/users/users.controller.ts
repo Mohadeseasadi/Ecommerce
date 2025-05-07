@@ -21,23 +21,25 @@ export class UsersController {
     @Query('page') page:number=1
   ) {
     const users = await this.usersService.findAll(limit, page);
-    return new APiResponse(true , 'Users fetching successfully' , users);
+    return new APiResponse(true , 'Users fetched successfully' , users);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(+id);
 
-    return new APiResponse(true , 'User fetching successflly' ,user )
+    return new APiResponse(true , 'User fetched successflly' ,user )
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.usersService.update(+id, updateUserDto);
+
+    return new APiResponse(true , 'User updated successfully', user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+
   }
 }

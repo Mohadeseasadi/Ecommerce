@@ -40,11 +40,23 @@ export class UsersService {
     return user
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User| null> {
+    const user = await this.findOne(id);
+
+    try {
+      const userUpdated = await this.userRepository.save({
+        ...user , 
+        ...updateUserDto
+      });
+
+      return userUpdated ;
+
+    } catch (error) {
+      throw new BadRequestException('Error updating user')
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<void> {
+
   }
 }
