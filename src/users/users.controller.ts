@@ -40,6 +40,8 @@ export class UsersController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
+    const user = await this.usersService.remove(+id);
 
+    return new APiResponse(true, 'User deleted successfully', null);
   }
 }
