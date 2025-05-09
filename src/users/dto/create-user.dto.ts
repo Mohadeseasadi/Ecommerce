@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 import UserRoleEnum from "../enums/user.enum";
 import { Transform } from "class-transformer";
 
@@ -17,7 +17,8 @@ export class CreateUserDto {
 
     @IsString()
     @IsOptional()
-    @MinLength(8, {message: "password length is 8 charcter"})
+    @MinLength(8, {message: "password should be 8 charcter"})
+    @MaxLength(16, {message: "password should be 8-16 charcter"})
     password: string;
     
     @IsEnum(UserRoleEnum, {message:"invalid role"})
