@@ -40,6 +40,14 @@ export class UsersService {
     return user
   }
 
+  async findOneByPhone(phone: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({phone});
+
+    if(!user) throw new NotFoundException(`Not found user by phone ${phone}`);
+
+    return user
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User| null> {
     const user = await this.findOne(id);
 
