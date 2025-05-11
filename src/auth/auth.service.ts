@@ -33,6 +33,10 @@ export class AuthService {
         sub: user.id ,
         display_name: user.display_name
     }
+    const token = this.jwtService.sign(payLoad)
 
+    return {
+      accessToken: token
+    }
   }
 }
