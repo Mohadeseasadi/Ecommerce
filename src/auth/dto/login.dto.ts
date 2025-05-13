@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, Matches, MinLength, MaxLength } from "class-validator";
 import { Transform } from "class-transformer";
 
-export class RegisterDto {
+export class LoginDto {
 
     @IsString()
     @Matches(/^.{11}$/ , {message: "invalid phone number"})

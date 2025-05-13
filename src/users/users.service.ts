@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { error } from 'console';
+import { BlobOptions } from 'buffer';
 
 @Injectable()
 export class UsersService {
@@ -15,11 +17,19 @@ export class UsersService {
   
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const newUser = this.userRepository.create(createUserDto);
+      const alreadyUser = await this.checkExist(createUserDto.phone);
 
-      return await this.userRepository.save(newUser);
+      if(!alreadyUser){
+        const newUser = this.userRepository.create(createUserDto);
 
+        return await this.userRepository.save(newUser);
+      } else {
+        throw new BadRequestException('There is a user with this phone number in the system.')
+      }
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new BadRequestException('Error creating user')
     }
   }
@@ -42,10 +52,14 @@ export class UsersService {
 
   async findOneByPhone(phone: string): Promise<User> {
     const user = await this.userRepository.findOneBy({phone});
-
+    
     if(!user) throw new NotFoundException(`Not found user by phone ${phone}`);
-
+     
     return user
+  }
+
+  async checkExist(phone: string): Promise<boolean> {
+    return await this.userRepository.findOneBy({phone}) ? true : false
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User| null> {

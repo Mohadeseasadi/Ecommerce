@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthController } from './auth.controller';
 
 
 @Module({
@@ -20,6 +21,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         signOption: { expireIn: configService.get('JWT_EXPIRATION') }
       })
     }),
-  ]
+  ], controllers: [AuthController]
 })
 export class AuthModule {}
