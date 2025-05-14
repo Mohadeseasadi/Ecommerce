@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import UserRoleEnum from "../enums/user.enum";
+import { Address } from "src/address/entities/address.entity";
 
 @Entity({name:'users'})
 export class User {
@@ -18,10 +19,13 @@ export class User {
     @Column({ type:'enum' , enum: UserRoleEnum, default:UserRoleEnum.User })
     role: UserRoleEnum ;
 
+    @OneToMany(()=> Address, (address)=>address.user )
+    addresses: Address[];
+
     @CreateDateColumn()
-    createAt: Date ;
+    create_at: Date ;
 
     @UpdateDateColumn()
-    updateAt: Date ;
+    update_at: Date ;
     
 }
