@@ -6,10 +6,10 @@ import { Collection, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn,
 export class Address {
     
     @PrimaryGeneratedColumn()
-    id: number ; 
+    id: number; 
 
     @Column({ nullable: false })
-    privince: string ;
+    province: string;
 
     @Column({ nullable: false })
     city: string;
