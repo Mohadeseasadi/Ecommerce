@@ -2,33 +2,44 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { APiResponse } from 'src/utils/api-response';
 
 @Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @Post()
-  create(@Body() createAddressDto: CreateAddressDto) {
-    return this.addressService.create(createAddressDto);
+  async create(@Body() createAddressDto: CreateAddressDto) {
+    const address = await this.addressService.create(createAddressDto);
+
+    return new APiResponse(true , 'Address created successfully' , address);
   }
 
   @Get()
-  findAll() {
-    return this.addressService.findAll();
+  async findAll() {
+    const addresses = await this.addressService.findAll();
+    
+    return new APiResponse(true , 'Addresses fetched successfully', addresses);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.addressService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const address = await this.addressService.findOne(+id);
+
+    return new APiResponse(true, 'Address fetched successfully', address);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
-    return this.addressService.update(+id, updateAddressDto);
+  async update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
+    const newAddress = await this.addressService.update(+id, updateAddressDto);
+
+    return new APiResponse(true, 'Address updated successfully', newAddress);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const result = await this.addressService.remove(+id);
+
+    return new APiResponse(true, 'Address deleted successfully', null);
   }
 }
