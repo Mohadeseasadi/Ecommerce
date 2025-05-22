@@ -19,15 +19,24 @@ export class AddressService {
   async create(createAddressDto: CreateAddressDto ): Promise<Address> {
     const {userId , ...addressData} = createAddressDto ;
 
-    const user = await this.userRepository.findOneByOrFail({id:userId});
+    const user = await this.userRepository.findOneBy({id:userId});
+
+    if(!user) throw new NotFoundException('User not found')
 
     const address = this.addressRepository.create({...addressData , user});
 
     return await this.addressRepository.save(address);
   }
 
-  async findAll(): Promise<Address[]> {
-    return await this.addressRepository.find({relations:['user']});
+  async findAll(limit: number, page: number): Promise<Address[]> {
+    const query = this.addressRepository
+      .createQueryBuilder('addresses')
+      .leftJoinAndSelect('addresses.user', 'users')
+      .skip(( page -1 )* limit)
+      .take(limit)
+
+
+    return await query.getMany();
   }
 
   async findOne(id: number): Promise<Address> {
