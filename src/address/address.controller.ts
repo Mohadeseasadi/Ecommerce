@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -16,8 +16,11 @@ export class AddressController {
   }
 
   @Get()
-  async findAll() {
-    const addresses = await this.addressService.findAll();
+  async findAll(    
+    @Query('limit') limit: number = 10,
+    @Query('page') page: number = 1
+  ) {
+    const addresses = await this.addressService.findAll(limit,page);
     
     return new APiResponse(true , 'Addresses fetched successfully', addresses);
   }
