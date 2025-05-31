@@ -1,31 +1,41 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import UserRoleEnum from "../enums/user.enum";
-import { Address } from "src/address/entities/address.entity";
+import { Address } from 'src/address/entities/address.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import UserRoleEnum from '../enums/user.enum';
 
-@Entity({name:'users'})
+@Entity({ name: 'users' })
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number ; 
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ unique: true })
-    phone: string ;
+  @Column({ unique: true })
+  phone: string;
 
-    @Column({ nullable: false })
-    display_name: string ;
-    
-    @Column({ nullable: true })
-    password: string ;
+  @Column({ nullable: false })
+  display_name: string;
 
-    @Column({ type:'enum' , enum: UserRoleEnum, default:UserRoleEnum.User })
-    role: UserRoleEnum ;
+  @Column({ nullable: true })
+  password: string;
 
-    @OneToMany(()=> Address, (address)=>address.user )
-    addresses: Address[];
+  @Column({ type: 'enum', enum: UserRoleEnum, default: UserRoleEnum.User })
+  role: UserRoleEnum;
 
-    @CreateDateColumn()
-    create_at: Date ;
+  @OneToMany(() => Address, (address) => address.user)
+  addresses: Address[];
 
-    @UpdateDateColumn()
-    update_at: Date ;
-    
+  @OneToMany(() => Ticket, (ticket) => ticket.user)
+  tickets: Ticket[];
+
+  @CreateDateColumn()
+  create_at: Date;
+
+  @UpdateDateColumn()
+  update_at: Date;
 }
