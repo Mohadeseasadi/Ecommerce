@@ -1,11 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UsersService } from 'src/users/users.service';
+import { Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { Ticket } from './entities/ticket.entity';
 
 @Injectable()
 export class TicketsService {
-  create(createTicketDto: CreateTicketDto) {
-    return 'This action adds a new ticket';
+  constructor(
+    @InjectRepository(Ticket)
+    private readonly ticketRepo: Repository<Ticket>,
+    private readonly userService: UsersService,
+  ) {}
+
+  async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
+    const { userId, replyTo, ...data } = createTicketDto;
+
+    const user = await this.userService.findOne(userId);
+
+    const replyto = replyTo
+      ? await this.ticketRepo.findOne({
+          where: { id: replyTo },
+          relations: ['replyto'],
+        })
+      : null;
+
+    if (replyto?.replyto)
+      throw new BadRequestException("You can't reply to a reply ticket");
+
+    const ticket = this.ticketRepo.create({
+      ...data,
+      user,
+      replyto: replyto as Ticket | undefined,
+    });
+
+    return await this.ticketRepo.save(ticket);
   }
 
   findAll() {
