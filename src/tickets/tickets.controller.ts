@@ -24,8 +24,9 @@ export class TicketsController {
   }
 
   @Get()
-  findAll() {
-    return this.ticketsService.findAll();
+  async findAll() {
+    const tickets = await this.ticketsService.findAll();
+    return new APiResponse(true, 'Ticket fetched successfully!', tickets);
   }
 
   @Get(':id')

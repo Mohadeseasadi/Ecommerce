@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from './entities/ticket.entity';
@@ -38,8 +38,11 @@ export class TicketsService {
     return await this.ticketRepo.save(ticket);
   }
 
-  findAll() {
-    return `This action returns all tickets`;
+  async findAll(): Promise<Ticket[]> {
+    return await this.ticketRepo.find({
+      where: { replyto: IsNull() },
+      relations: ['replyto'],
+    });
   }
 
   findOne(id: number) {
