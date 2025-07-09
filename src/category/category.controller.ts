@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { APiResponse } from 'src/utils/api-response';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 
@@ -7,12 +8,14 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    const category = await this.categoryService.create(createCategoryDto);
+    return new APiResponse(true, 'Create category successfully', category);
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  async findAll() {
+    const categories = await this.categoryService.findAll();
+    return new APiResponse(true, 'fetch categories successfully', categories);
   }
 }
