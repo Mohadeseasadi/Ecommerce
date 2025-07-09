@@ -1,7 +1,10 @@
+import { Category } from 'src/category/entities/category.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,6 +25,14 @@ export class Product {
 
   @Column({ nullable: false })
   stock: number;
+
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable({
+    name: 'product_category',
+    joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+  })
+  categories: Category[];
 
   @CreateDateColumn()
   create_at: Date;
