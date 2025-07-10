@@ -15,7 +15,7 @@ export class Product {
   id: number;
 
   @Column({ nullable: false })
-  tiile: string;
+  title: string;
 
   @Column({ nullable: false })
   description: string;
