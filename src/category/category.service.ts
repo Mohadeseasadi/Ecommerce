@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Product } from 'src/products/entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { Category } from './entities/category.entity';
@@ -13,6 +14,8 @@ export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
@@ -50,6 +53,13 @@ export class CategoryService {
     if (category.products.length > 0)
       throw new BadRequestException('THis category have more products');
 
+    await this.categoryRepo.remove(category);
+  }
+
+  async remove(id: number): Promise<void> {
+    const category = await this.findOne(id);
+
+    await this.productRepo.remove(category.products);
     await this.categoryRepo.remove(category);
   }
 }

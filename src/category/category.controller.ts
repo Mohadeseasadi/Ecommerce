@@ -19,8 +19,8 @@ export class CategoryController {
     return new APiResponse(true, 'Fetch categories successfully', categories);
   }
 
-  @Delete('remove-onlt-category/:id')
-  async remove(@Param('id') id: string) {
+  @Delete('remove-only-category/:id')
+  async removeOnlyCategory(@Param('id') id: string) {
     const category = await this.categoryService.removeOnlyCategory(+id);
     return new APiResponse(true, 'Delete categories successfully', category);
   }
@@ -28,6 +28,12 @@ export class CategoryController {
   @Delete('safe-remove-category/:id')
   async saferemove(@Param('id') id: string) {
     const category = await this.categoryService.safeRemove(+id);
+    return new APiResponse(true, 'Delete categories successfully', category);
+  }
+
+  @Delete('remove-category/:id')
+  async remove(@Param('id') id: string) {
+    const category = await this.categoryService.remove(+id);
     return new APiResponse(true, 'Delete categories successfully', category);
   }
 }
