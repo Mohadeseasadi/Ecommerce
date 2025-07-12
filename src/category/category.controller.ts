@@ -24,4 +24,10 @@ export class CategoryController {
     const category = await this.categoryService.removeOnlyCategory(+id);
     return new APiResponse(true, 'Delete categories successfully', category);
   }
+
+  @Delete('safe-remove-category/:id')
+  async saferemove(@Param('id') id: string) {
+    const category = await this.categoryService.safeRemove(+id);
+    return new APiResponse(true, 'Delete categories successfully', category);
+  }
 }

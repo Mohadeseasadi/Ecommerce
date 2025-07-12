@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -37,6 +41,15 @@ export class CategoryService {
     await this.categoryRepo.save(category);
 
     // remove category
+    await this.categoryRepo.remove(category);
+  }
+
+  async safeRemove(id: number): Promise<void> {
+    const category = await this.findOne(id);
+
+    if (category.products.length > 0)
+      throw new BadRequestException('THis category have more products');
+
     await this.categoryRepo.remove(category);
   }
 }
