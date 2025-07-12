@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { APiResponse } from 'src/utils/api-response';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -16,6 +16,12 @@ export class CategoryController {
   @Get()
   async findAll() {
     const categories = await this.categoryService.findAll();
-    return new APiResponse(true, 'fetch categories successfully', categories);
+    return new APiResponse(true, 'Fetch categories successfully', categories);
+  }
+
+  @Delete('remove-onlt-category/:id')
+  async remove(@Param('id') id: string) {
+    const category = await this.categoryService.removeOnlyCategory(+id);
+    return new APiResponse(true, 'Delete categories successfully', category);
   }
 }
