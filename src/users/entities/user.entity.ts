@@ -1,4 +1,5 @@
 import { Address } from 'src/address/entities/address.entity';
+import { Bookmark } from 'src/products/entities/product-bookmark.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import {
   Column,
@@ -32,6 +33,9 @@ export class User {
 
   @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[];
+
+  @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
+  bookmarks: Bookmark[];
 
   @CreateDateColumn()
   create_at: Date;
