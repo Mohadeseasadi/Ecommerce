@@ -18,18 +18,19 @@ export class BookmarksService {
 
   async create(
     createBookmarkDto: BookmarkProductDTO,
-  ): Promise<{ bookmark: Bookmark; msg: string }> {
+  ): Promise<{ bookmark: Bookmark | void; msg: string }> {
     const user = await this.userService.findOne(createBookmarkDto.user_id);
+
     const product = await this.productService.findOne(
       createBookmarkDto.product_id,
     );
 
     const exitingBookmark = await this.bookmarkRepo.findOne({
-      where: { user: user, product: product },
+      where: { user: { id: user.id }, product: { id: product.id } },
     });
-
     if (exitingBookmark) {
       const bookmark = await this.bookmarkRepo.remove(exitingBookmark);
+
       return { bookmark, msg: 'deleted bookmark' };
     } else {
       const newBookmark = this.bookmarkRepo.create({
@@ -37,6 +38,7 @@ export class BookmarksService {
         product,
       });
       const bookmark = await this.bookmarkRepo.save(newBookmark);
+
       return { bookmark, msg: 'created bookmark' };
     }
   }
