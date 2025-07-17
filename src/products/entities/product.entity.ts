@@ -1,4 +1,5 @@
 import { Category } from 'src/category/entities/category.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -35,6 +36,9 @@ export class Product {
     inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
   })
   categories: Category[];
+
+  @ManyToMany(() => User, (user) => user.basket_items)
+  baskets: User[];
 
   @OneToMany(() => Bookmark, (bookmark) => bookmark.product)
   bookmarks: Bookmark[];
