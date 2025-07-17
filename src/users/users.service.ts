@@ -16,6 +16,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -90,16 +93,29 @@ export class UsersService {
     }
   }
 
-  async addProductToBasket(userId: number, product: Product): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['basket_items'],
-    });
-    if (!user) throw new NotFoundException(`Not found user by id ${userId}`);
+  async addProductToBasketById(
+    userId: number,
+    productId: number,
+  ): Promise<User> {
+    const [user, product] = await Promise.all([
+      this.userRepository.findOne({
+        where: { id: userId },
+        relations: ['basket_items'],
+      }),
+      this.productRepository.findOneBy({ id: productId }),
+    ]);
 
-    user.basket_items.push(product);
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
+    if (!product)
+      throw new NotFoundException(`Product with ID ${productId} not found`);
 
-    return await this.userRepository.save(user);
+    const alreadyExists = user.basket_items.some(
+      (item) => item.id === product.id,
+    );
+    if (alreadyExists) return user;
+
+    user.basket_items = [...user.basket_items, product];
+    return this.userRepository.save(user);
   }
 
   async removeProductFromBasket(
@@ -110,17 +126,17 @@ export class UsersService {
       where: { id: userId },
       relations: ['basket_items'],
     });
-    if (!user) throw new NotFoundException(`Not found user by id ${userId}`);
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 
-    const productIndex = user.basket_items.findIndex(
-      (item) => item.id == productId,
+    const originalLength = user.basket_items.length;
+    user.basket_items = user.basket_items.filter(
+      (item) => item.id !== productId,
     );
 
-    if (productIndex == -1) {
+    if (user.basket_items.length === originalLength) {
       throw new NotFoundException('Product not found in basket');
     }
 
-    user.basket_items.splice(productIndex, 1);
     await this.userRepository.save(user);
   }
 }

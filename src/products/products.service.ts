@@ -81,12 +81,10 @@ export class ProductsService {
   }
 
   async addItemToBasket(userId: number, productId: number): Promise<User> {
-    const product = await this.findOne(productId);
-    return await this.userService.addProductToBasket(userId, product);
+    return this.userService.addProductToBasketById(userId, productId);
   }
 
   async removeItemFromBasket(userId: number, productId: number): Promise<void> {
-    const product = await this.findOne(productId);
-    await this.userService.removeProductFromBasket(userId, product.id);
+    await this.userService.removeProductFromBasket(userId, productId);
   }
 }
