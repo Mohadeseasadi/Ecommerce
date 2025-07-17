@@ -90,7 +90,7 @@ export class UsersService {
     }
   }
 
-  async addProductToBasket(userId: number, product: Product) {
+  async addProductToBasket(userId: number, product: Product): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['basket_items'],
@@ -100,5 +100,27 @@ export class UsersService {
     user.basket_items.push(product);
 
     return await this.userRepository.save(user);
+  }
+
+  async removeProductFromBasket(
+    userId: number,
+    productId: number,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['basket_items'],
+    });
+    if (!user) throw new NotFoundException(`Not found user by id ${userId}`);
+
+    const productIndex = user.basket_items.findIndex(
+      (item) => item.id == productId,
+    );
+
+    if (productIndex == -1) {
+      throw new NotFoundException('Product not found in basket');
+    }
+
+    user.basket_items.splice(productIndex, 1);
+    await this.userRepository.save(user);
   }
 }

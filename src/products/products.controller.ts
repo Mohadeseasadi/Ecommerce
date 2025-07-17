@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { APiResponse } from 'src/utils/api-response';
-import { BookmarkProductDTO } from './dto/create-bookmark.dto';
+import { BasketDTO } from './dto/basket.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -49,12 +49,25 @@ export class ProductsController {
     return this.productsService.remove(+id);
   }
 
-  @Post('baskets')
-  async addItemToBasket(@Body() bookmarkDto: BookmarkProductDTO) {
-    const product = await this.productsService.addItemToBasket(
-      bookmarkDto.user_id,
-      bookmarkDto.product_id,
+  @Post('add-baskets')
+  async addItemToBasket(@Body() basketDto: BasketDTO) {
+    const result = await this.productsService.addItemToBasket(
+      basketDto.user_id,
+      basketDto.product_id,
     );
-    return new APiResponse(true, 'Add product to basket successfully', product);
+    return new APiResponse(true, 'Add product to basket successfully', result);
+  }
+
+  @Post('remove-baskets')
+  async removeItemFromBasket(@Body() basketDto: BasketDTO) {
+    await this.productsService.removeItemFromBasket(
+      basketDto.user_id,
+      basketDto.product_id,
+    );
+    return new APiResponse(
+      true,
+      'Remove product from basket successfully',
+      null,
+    );
   }
 }
