@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/category/entities/category.entity';
+import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -14,6 +15,8 @@ export class ProductsService {
 
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+
+    private readonly userService: UsersService,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
@@ -74,5 +77,11 @@ export class ProductsService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+
+  async addItemToBasket(userId: number, productId: number) {
+    const product = await this.findOne(productId);
+
+    return await this.userService.addProductToBasket(userId, product);
   }
 }

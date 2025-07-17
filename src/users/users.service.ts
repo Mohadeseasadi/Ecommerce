@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Product } from 'src/products/entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -87,5 +88,17 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException(`Not found user by id ${id}`);
     }
+  }
+
+  async addProductToBasket(userId: number, product: Product) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['basket_items'],
+    });
+    if (!user) throw new NotFoundException(`Not found user by id ${userId}`);
+
+    user.basket_items.push(product);
+
+    return await this.userRepository.save(user);
   }
 }
