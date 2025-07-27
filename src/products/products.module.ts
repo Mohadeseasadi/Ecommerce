@@ -16,5 +16,6 @@ import { BookmarksService } from './services/bookmark.service';
   ],
   controllers: [ProductsController, BookmarksController],
   providers: [ProductsService, BookmarksService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}
