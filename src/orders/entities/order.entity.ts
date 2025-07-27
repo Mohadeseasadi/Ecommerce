@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderStatus } from '../enums/order-status.enum';
+import { OrderItem } from './order-items.entity';
 
 @Entity('orders')
 export class Order {
@@ -32,6 +34,9 @@ export class Order {
 
   @Column({ type: 'varchar', nullable: true })
   diccount_code: string;
+
+  @OneToMany(() => OrderItem, (item) => item.order)
+  items: OrderItem[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   create_at: Date;
