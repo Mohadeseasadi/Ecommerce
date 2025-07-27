@@ -1,4 +1,5 @@
 import { Address } from 'src/address/entities/address.entity';
+import { Order } from 'src/orders/entities/order.entity';
 import { Bookmark } from 'src/products/entities/product-bookmark.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
@@ -47,6 +48,9 @@ export class User {
     inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
   })
   basket_items: Product[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @CreateDateColumn()
   create_at: Date;
