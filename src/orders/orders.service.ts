@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddressService } from 'src/address/address.service';
 import { ProductsService } from 'src/products/products.service';
@@ -38,7 +38,7 @@ export class OrdersService {
     if (createOrderDto.items && createOrderDto.items.length > 0) {
       const orderItems = createOrderDto.items.map(async (item) => {
         const product = await this.productService.findOne(item.productId);
-        const orderItem = await this.orderItemRepo.create({
+        const orderItem = this.orderItemRepo.create({
           order: savedOrder,
           product,
           quantity: item.quantity,
@@ -51,19 +51,66 @@ export class OrdersService {
     return savedOrder;
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async findAll(): Promise<Order[]> {
+    return this.orderRepo.find({
+      relations: ['user', 'address', 'items', 'items.product'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number): Promise<Order> {
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: ['user', 'address', 'items', 'items.product'],
+    });
+
+    if (!order) throw new NotFoundException('Order not found ');
+
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) {
+      throw new Error(`Order with id ${id} not found`);
+    }
+
+    if (updateOrderDto.userId) {
+      const user = await this.userService.findOne(updateOrderDto.userId);
+      order.user = user;
+    }
+
+    if (updateOrderDto.addressId) {
+      const address = await this.addressService.findOne(
+        updateOrderDto.addressId,
+      );
+      order.address = address;
+    }
+
+    if (updateOrderDto.status) {
+      order.status = updateOrderDto.status;
+    }
+
+    if (updateOrderDto.payed_time) {
+      order.payed_time = new Date(updateOrderDto.payed_time);
+    }
+
+    if (updateOrderDto.total_price !== undefined) {
+      order.total_price = updateOrderDto.total_price;
+    }
+
+    if (updateOrderDto.diccount_code !== undefined) {
+      order.diccount_code = updateOrderDto.diccount_code;
+    }
+
+    return this.orderRepo.save(order);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: number): Promise<void> {
+    const order = await this.findOne(id);
+
+    if (order.items && order.items.length > 0) {
+      await this.orderItemRepo.remove(order.items);
+    }
+    await this.orderRepo.remove(order);
   }
 }

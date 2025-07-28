@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { APiResponse } from 'src/utils/api-response';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrdersService } from './orders.service';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto) {
+    const order = await this.ordersService.create(createOrderDto);
+    return new APiResponse(true, 'Order created successfully !');
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  async findAll() {
+    const orders = await this.ordersService.findAll();
+    return new APiResponse(true, 'Orders fetched successfully!', orders);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const order = await this.ordersService.findOne(+id);
+    return new APiResponse(true, 'Order fetched successfully!', order);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    const updatedOrder = await this.ordersService.update(+id, updateOrderDto);
+    return new APiResponse(true, 'Order updated successfully!', updatedOrder);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.ordersService.remove(+id);
+    return new APiResponse(true, `Order with id ${id} deleted successfully!`);
   }
 }
