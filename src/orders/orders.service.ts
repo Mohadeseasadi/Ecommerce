@@ -69,10 +69,7 @@ export class OrdersService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    const order = await this.orderRepo.findOne({ where: { id } });
-    if (!order) {
-      throw new Error(`Order with id ${id} not found`);
-    }
+    const order = await this.findOne(id);
 
     if (updateOrderDto.userId) {
       const user = await this.userService.findOne(updateOrderDto.userId);
