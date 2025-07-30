@@ -29,7 +29,7 @@ export class Order {
   @ManyToOne(() => Address, (address) => address.orders)
   address: Address;
 
-  @Column({ type: 'bigint' })
+  @Column({ type: 'bigint', default: 0 })
   total_price: number;
 
   @Column({ type: 'varchar', nullable: true })

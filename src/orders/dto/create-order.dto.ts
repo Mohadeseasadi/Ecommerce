@@ -4,7 +4,6 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -26,9 +25,6 @@ export class CreateOrderDto {
 
   @IsInt()
   addressId: number;
-
-  @IsNumber()
-  total_price: number;
 
   @IsString()
   @IsOptional()

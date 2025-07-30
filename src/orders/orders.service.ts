@@ -22,33 +22,48 @@ export class OrdersService {
     private readonly productService: ProductsService,
   ) {}
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const user = await this.userService.findOne(createOrderDto.userId);
-    const address = await this.addressService.findOne(createOrderDto.addressId);
+    // get user and adddress
+    const [user, address] = await Promise.all([
+      this.userService.findOne(createOrderDto.userId),
+      this.addressService.findOne(createOrderDto.addressId),
+    ]);
 
-    const order = this.orderRepo.create({
-      user,
-      address,
-      total_price: createOrderDto.total_price,
-      diccount_code: createOrderDto.diccount_code,
-      status: createOrderDto.status,
-    });
+    // create order
+    const order = await this.orderRepo.save(
+      this.orderRepo.create({
+        user,
+        address,
+        diccount_code: createOrderDto.diccount_code,
+        status: createOrderDto.status,
+      }),
+    );
 
-    const savedOrder = await this.orderRepo.save(order);
+    let totalPrice = 0;
+    const orderItemsToSave: OrderItem[] = [];
 
-    if (createOrderDto.items && createOrderDto.items.length > 0) {
-      const orderItems = createOrderDto.items.map(async (item) => {
-        const product = await this.productService.findOne(item.productId);
-        const orderItem = this.orderItemRepo.create({
-          order: savedOrder,
+    for (const item of createOrderDto.items ?? []) {
+      const product = await this.productService.findOne(item.productId);
+      totalPrice += product.price * item.quantity;
+
+      orderItemsToSave.push(
+        this.orderItemRepo.create({
+          order,
           product,
           quantity: item.quantity,
-        });
-
-        return this.orderItemRepo.save(orderItem);
-      });
-      await Promise.all(orderItems);
+        }),
+      );
     }
-    return savedOrder;
+
+    if (orderItemsToSave.length) {
+      await this.orderItemRepo.save(orderItemsToSave);
+    }
+
+    await this.orderRepo.update(order.id, { total_price: totalPrice });
+
+    return this.orderRepo.findOne({
+      where: { id: order.id },
+      relations: ['items', 'items.product'],
+    }) as Promise<Order>;
   }
 
   async findAll(): Promise<Order[]> {
@@ -89,10 +104,6 @@ export class OrdersService {
 
     if (updateOrderDto.payed_time) {
       order.payed_time = new Date(updateOrderDto.payed_time);
-    }
-
-    if (updateOrderDto.total_price !== undefined) {
-      order.total_price = updateOrderDto.total_price;
     }
 
     if (updateOrderDto.diccount_code !== undefined) {
