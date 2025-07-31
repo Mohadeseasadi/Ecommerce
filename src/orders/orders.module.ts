@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AddressModule } from 'src/address/address.module';
@@ -17,6 +18,7 @@ import { OrdersService } from './orders.service';
     UsersModule,
     AddressModule,
     ProductsModule,
+    HttpModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

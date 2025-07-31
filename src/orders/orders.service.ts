@@ -1,5 +1,7 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { firstValueFrom } from 'rxjs';
 import { AddressService } from 'src/address/address.service';
 import { ProductsService } from 'src/products/products.service';
 import { UsersService } from 'src/users/users.service';
@@ -20,6 +22,7 @@ export class OrdersService {
     private readonly userService: UsersService,
     private readonly addressService: AddressService,
     private readonly productService: ProductsService,
+    private readonly httpService: HttpService,
   ) {}
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     // get user and adddress
@@ -120,5 +123,17 @@ export class OrdersService {
       await this.orderItemRepo.remove(order.items);
     }
     await this.orderRepo.remove(order);
+  }
+
+  async startPayment(amount: number) {
+    const data = {
+      merchant: process.env.MERCHANT,
+      callbackUrl: process.env.CALLBACKURL,
+      amount: amount * 10,
+    };
+    const response = await firstValueFrom(
+      this.httpService.post('https://gateway.zibal.ir/v1/request', data),
+    );
+    return response.data;
   }
 }

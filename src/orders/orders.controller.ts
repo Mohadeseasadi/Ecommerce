@@ -48,4 +48,10 @@ export class OrdersController {
     await this.ordersService.remove(+id);
     return new APiResponse(true, `Order with id ${id} deleted successfully!`);
   }
+
+  @Post('/start-payment/:id')
+  async startPayment(@Param('id') id: string) {
+    const result = await this.ordersService.startPayment(+id);
+    return new APiResponse(true, `Payment started!`, result);
+  }
 }
