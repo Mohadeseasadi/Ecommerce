@@ -52,6 +52,14 @@ export class OrdersController {
   @Post('/start-payment/:id')
   async startPayment(@Param('id') id: string) {
     const result = await this.ordersService.startPayment(+id);
+    return new APiResponse(true, `Payment started!`, {
+      paymentUrl: 'https://gateway.zibal.ir/start/' + result.trackId,
+    });
+  }
+
+  @Post('/verify-payment/:id')
+  async verifyPayment(@Param('id') id: string) {
+    const result = await this.ordersService.verifyPayment(+id);
     return new APiResponse(true, `Payment started!`, result);
   }
 }
