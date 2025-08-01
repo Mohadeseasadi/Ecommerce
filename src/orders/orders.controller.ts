@@ -11,6 +11,7 @@ import { APiResponse } from 'src/utils/api-response';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { PaymentOrderDTO } from './dto/payment-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { VerifyPaymentOrderDTO } from './dto/verify-payment-order.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('orders')
@@ -59,9 +60,12 @@ export class OrdersController {
     return new APiResponse(true, `Payment started!`, result);
   }
 
-  @Post('/verify-payment/:id')
-  async verifyPayment(@Param('id') id: string) {
-    const result = await this.ordersService.verifyPayment(+id);
+  @Post('/verify-payment')
+  async verifyPayment(@Body() verifyPaymentOrderDto: VerifyPaymentOrderDTO) {
+    const result = await this.ordersService.verifyPayment(
+      verifyPaymentOrderDto.trackId,
+      verifyPaymentOrderDto.orderId,
+    );
     return new APiResponse(true, `Payment started!`, result);
   }
 }

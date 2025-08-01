@@ -10,6 +10,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderItem } from './entities/order-items.entity';
 import { Order } from './entities/order.entity';
+import { OrderStatus } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -131,6 +132,7 @@ export class OrdersService {
 
     // set data
     const data = {
+      orderId,
       merchant: process.env.MERCHANT,
       callbackUrl: process.env.CALLBACKURL,
       amount: order.total_price * 10,
@@ -147,14 +149,26 @@ export class OrdersService {
     };
   }
 
-  async verifyPayment(trackId: number) {
+  async verifyPayment(trackId: number, orderId: number) {
+    // set data
     const data = {
       merchant: process.env.MERCHANT,
       trackId,
     };
+
+    // request to zibal for verify
     const response = await firstValueFrom(
       this.httpService.post('https://gateway.zibal.ir/v1/verify', data),
     );
+
+    // if successfully change order status
+    if (response.data.result == 100) {
+      const order = await this.findOne(orderId);
+      order.status = OrderStatus.COMPLETED;
+      await this.orderRepo.save(order);
+    }
+
+    // return data
     return response.data;
   }
 }
