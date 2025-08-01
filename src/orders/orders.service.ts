@@ -71,7 +71,7 @@ export class OrdersService {
 
   async findAll(): Promise<Order[]> {
     return this.orderRepo.find({
-      relations: ['user', 'address', 'items', 'items.product'],
+      relations: ['items', 'items.product'],
     });
   }
 
@@ -125,16 +125,26 @@ export class OrdersService {
     await this.orderRepo.remove(order);
   }
 
-  async startPayment(amount: number) {
+  async startPayment(orderId: number) {
+    // find order
+    const order = await this.findOne(orderId);
+
+    // set data
     const data = {
       merchant: process.env.MERCHANT,
       callbackUrl: process.env.CALLBACKURL,
-      amount: amount * 10,
+      amount: order.total_price * 10,
     };
+
+    // request to zibal for start payment
     const response = await firstValueFrom(
       this.httpService.post('https://gateway.zibal.ir/v1/request', data),
     );
-    return response.data;
+
+    // return url for start payment
+    return {
+      paymentUrl: 'https://gateway.zibal.ir/start/' + response.data.trackId,
+    };
   }
 
   async verifyPayment(trackId: number) {

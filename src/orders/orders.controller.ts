@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { APiResponse } from 'src/utils/api-response';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { PaymentOrderDTO } from './dto/payment-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
 
@@ -49,12 +50,13 @@ export class OrdersController {
     return new APiResponse(true, `Order with id ${id} deleted successfully!`);
   }
 
-  @Post('/start-payment/:id')
-  async startPayment(@Param('id') id: string) {
-    const result = await this.ordersService.startPayment(+id);
-    return new APiResponse(true, `Payment started!`, {
-      paymentUrl: 'https://gateway.zibal.ir/start/' + result.trackId,
-    });
+  @Post('/start-payment')
+  async startPayment(@Body() paymentOrderDto: PaymentOrderDTO) {
+    const result = await this.ordersService.startPayment(
+      paymentOrderDto.orderId,
+    );
+
+    return new APiResponse(true, `Payment started!`, result);
   }
 
   @Post('/verify-payment/:id')
