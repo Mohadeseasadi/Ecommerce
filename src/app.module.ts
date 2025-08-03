@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
-import { DatabaseModule } from './config/database.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AddressModule } from './address/address.module';
-import { TicketsModule } from './tickets/tickets.module';
-import { ProductsModule } from './products/products.module';
+import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
+import { DatabaseModule } from './config/database.module';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,9 +18,13 @@ import { OrdersModule } from './orders/orders.module';
     TicketsModule,
     ProductsModule,
     CategoryModule,
-    OrdersModule ,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
