@@ -1,6 +1,5 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoggerMiddleware } from 'src/middleware/logger.middleware';
 import { User } from 'src/users/entities/user.entity';
 import { AddressController } from './address.controller';
 import { AddressService } from './address.service';
@@ -13,12 +12,12 @@ import { Address } from './entities/address.entity';
   exports: [AddressService],
 })
 export class AddressModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(
-        { path: 'address', method: RequestMethod.POST },
-        { path: 'address/:id', method: RequestMethod.GET },
-      );
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(LoggerMiddleware)
+  //     .forRoutes(
+  //       { path: 'address', method: RequestMethod.POST },
+  //       { path: 'address/:id', method: RequestMethod.GET },
+  //     );
+  // }
 }
