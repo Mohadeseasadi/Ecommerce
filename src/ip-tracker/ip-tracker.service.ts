@@ -15,7 +15,7 @@ export class IpTrackerService {
   ) {}
 
   async track(ip: any) {
-    const nowTime = Date.now();
+    const nowTime = new Date();
 
     let record = await this.ipTrackerRepo.findOne({ where: { ip } });
 
