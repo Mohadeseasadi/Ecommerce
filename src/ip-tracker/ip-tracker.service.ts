@@ -19,6 +19,17 @@ export class IpTrackerService {
     return new Date(Date.now() + this.TEHRAN_OFFSET_MS);
   }
 
+  private throwBlocked(blockUntil: Date) {
+    throw new HttpException(
+      {
+        statusCode: 429,
+        error: 'Too Many Requests',
+        message: `You are blocked until ${blockUntil.toLocaleString('fa-IR')}`,
+      },
+      429,
+    );
+  }
+
   async track(ip: string): Promise<void> {
     const now = this.getTehranNow();
 
@@ -33,21 +44,12 @@ export class IpTrackerService {
         block_until: null,
       });
       await this.ipTrackerRepo.save(record);
-      console.log(
-        `[IP TRACKER] ${ip} - First request at ${record.window_start}`,
-      );
+
       return;
     }
 
     if (record.is_blocked && record.block_until && record.block_until > now) {
-      throw new HttpException(
-        {
-          statusCode: 429,
-          error: 'Too Many Requests',
-          message: `You are blocked until ${record.block_until.toLocaleString('fa-IR')}`,
-        },
-        429,
-      );
+      this.throwBlocked(record.block_until);
     }
 
     const windowEnd = new Date(
@@ -55,29 +57,22 @@ export class IpTrackerService {
     );
 
     if (now > windowEnd) {
-      // Start a new window
       record.request_count = 1;
       record.window_start = now;
       record.is_blocked = false;
       record.block_until = null;
-      console.log(`[IP TRACKER] ${ip} - Window reset at ${now}`);
     } else {
       if (record.request_count >= this.MAX_REQUESTS) {
         record.is_blocked = true;
         record.block_until = new Date(
           now.getTime() + this.BLOCK_MINUTES * 60 * 1000,
         );
-        console.warn(
-          `[IP TRACKER] ${ip} - Blocked until ${record.block_until}`,
-        );
+        await this.ipTrackerRepo.save(record);
+        this.throwBlocked(record.block_until);
       } else {
         record.request_count += 1;
-        console.log(
-          `[IP TRACKER] ${ip} - Incremented count to ${record.request_count}`,
-        );
       }
     }
-
     await this.ipTrackerRepo.save(record);
   }
 }
