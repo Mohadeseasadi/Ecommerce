@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -14,21 +15,27 @@ import { Bookmark } from './product-bookmark.entity';
 
 @Entity({ name: 'products' })
 export class Product {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty()
   @Column({ nullable: false })
   title: string;
 
+  @ApiProperty()
   @Column({ nullable: false })
   description: string;
 
+  @ApiProperty()
   @Column({ nullable: false })
   price: number;
 
+  @ApiProperty()
   @Column({ nullable: false })
   stock: number;
 
+  @ApiProperty({ type: [Category] })
   @ManyToMany(() => Category, (category) => category.products)
   @JoinTable({
     name: 'product_category',
@@ -43,9 +50,11 @@ export class Product {
   @OneToMany(() => Bookmark, (bookmark) => bookmark.product)
   bookmarks: Bookmark[];
 
+  @ApiProperty()
   @CreateDateColumn()
   create_at: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   update_at: Date;
 }
