@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Address } from 'src/address/entities/address.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Bookmark } from 'src/products/entities/product-bookmark.entity';
@@ -17,18 +18,23 @@ import UserRoleEnum from '../enums/user.enum';
 
 @Entity({ name: 'users' })
 export class User {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty()
   @Column({ unique: true })
   phone: string;
 
+  @ApiProperty()
   @Column({ nullable: false })
   display_name: string;
 
+  @ApiProperty()
   @Column({ nullable: true })
   password: string;
 
+  @ApiProperty()
   @Column({ type: 'enum', enum: UserRoleEnum, default: UserRoleEnum.User })
   role: UserRoleEnum;
 
@@ -52,9 +58,11 @@ export class User {
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 
+  @ApiProperty()
   @CreateDateColumn()
   create_at: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   update_at: Date;
 }
