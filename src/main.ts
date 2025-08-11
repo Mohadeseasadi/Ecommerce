@@ -7,6 +7,7 @@ import { LoggerMiddleware } from './middleware/logger/logger.middleware';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // app.useGlobalGuards(new JwtAuthGuard()); ----> globally guard
   app.useGlobalPipes(new ValidationPipe());
   app.use(new LoggerMiddleware().use);
 
