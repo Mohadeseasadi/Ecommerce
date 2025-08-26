@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,8 +17,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/role.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/role.guard';
 import { APiResponse } from 'src/utils/api-response';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
@@ -30,7 +27,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import UserRoleEnum from './enums/user.enum';
 import { UsersService } from './users.service';
 
-@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Users Management')
 @Controller('users')
 export class UsersController {
