@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Address } from 'src/address/entities/address.entity';
+import { Permissions } from 'src/auth/entities/permission.entity';
+import { Role } from 'src/auth/entities/role.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Bookmark } from 'src/products/entities/product-bookmark.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -65,4 +67,12 @@ export class User {
   @ApiProperty()
   @UpdateDateColumn()
   update_at: Date;
+
+  @ManyToMany(() => Role)
+  @JoinTable({ name: 'users_roles' })
+  roles: Role[];
+
+  @ManyToMany(() => Permissions, { eager: true })
+  @JoinTable({ name: 'users_permissions' })
+  permissions: Permissions[];
 }
