@@ -3,8 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import UserRoleEnum from 'src/users/enums/user.enum';
 import { UsersService } from 'src/users/users.service';
-import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,14 +17,14 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     return this.userService.create({
-      phone :registerDto.phone,
+      phone: registerDto.phone,
       password: hashedPassword,
       display_name: registerDto.display_name,
       role: UserRoleEnum.User,
-    }); 
+    });
   }
 
-  async login(loginDto: LoginDto){
+  async login(loginDto: LoginDto) {
     const user = await this.userService.findOneByPhone(loginDto.phone);
 
     // if (!user) {
@@ -35,14 +35,18 @@ export class AuthService {
       throw new UnauthorizedException('password is incorrect');
     }
     const payLoad = {
-        phone: user.phone ,
-        sub: user.id ,
-        display_name: user.display_name
-    }
-    const token = this.jwtService.sign(payLoad)
+      phone: user.phone,
+      sub: user.id,
+      display_name: user.display_name,
+    };
+    const token = this.jwtService.sign(payLoad);
 
     return {
-      accessToken: token
-    }
+      accessToken: token,
+    };
+  }
+
+  async getUserPermission(userId: number) {
+    const user = await this.userService.findOneByPermission(userId);
   }
 }
