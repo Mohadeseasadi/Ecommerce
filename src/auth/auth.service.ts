@@ -49,11 +49,14 @@ export class AuthService {
   async getUserPermission(userId: number) {
     const user = await this.userService.findOneByPermission(userId);
 
-    const permissions = new Set<string>()
+    const permissions = new Set<string>();
 
-    user.role?.forEach((role)=> {
-      role.permissions?.
+    user.roles?.forEach((role) => {
+      role.permissions?.forEach((p) => permissions.add(p.name));
+    });
 
-    })
+    user.permissions.forEach((p) => permissions.add(p.name));
+
+    return Array.from(permissions);
   }
 }
